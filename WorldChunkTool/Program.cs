@@ -17,7 +17,6 @@ namespace WorldChunkTool
             int magic_chunk = 0x00504D43;   // 43 4D 50 00
             int magic_pkg = 0x20474B50;     // 50 4B 47 20
             string input_str = "";
-            string mode = "";
             string PKGextraction = "";
             bool PKGextraction_flag = true;
 
@@ -32,12 +31,11 @@ namespace WorldChunkTool
             }
 
             // Check file
-            input_str = args[0];
-            if (args.Length > 1) { mode = args[1]; }            
+            input_str = args[0];         
             if (!File.Exists(input_str)) { Console.WriteLine("ERROR: Specified file doesn't exist."); return; }
 
             // Turn file output on or off
-            if (args.Length > 2) { PKGextraction = args[2]; }
+            if (args.Length > 1) { PKGextraction = args[1]; }
             if (PKGextraction.Equals("false", StringComparison.InvariantCultureIgnoreCase)) { PKGextraction_flag = false; }
             if (PKGextraction_flag == false) { Console.WriteLine("PKG extraction turned off.\n"); }
 
