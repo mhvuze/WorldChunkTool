@@ -4,7 +4,7 @@ Tool to decompress Monster Hunter: World chunkN.bin files and extract the result
 ```
 WorldChunkTool by MHVuze
 
-Usage: WorldChunkTool <chunkN_file> (PKGext)
+Usage: WorldChunkTool <chunkN_file|PKG_file> (PKGext)
 
 PKGext: use 'false' to turn off PKG file extraction, defaults to 'true'
 ```
