@@ -24,7 +24,7 @@ namespace WorldChunkTool
             if (args.Length == 0)
             {
                 Console.WriteLine("WorldChunkTool by MHVuze");
-                Console.WriteLine("Usage: WorldChunkTool <chunkN_file> (PKGext)");
+                Console.WriteLine("Usage: WorldChunkTool <chunkN_file|PKG_file> (PKGext)");
                 Console.WriteLine("PKGext: use 'false' to turn off PKG file extraction, defaults to 'true'");
                 Console.Read();
                 return;
