@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WorldChunkTool
 {
@@ -47,30 +44,22 @@ namespace WorldChunkTool
             // Write decompressed chunks to pkg
             BinaryWriter Writer = new BinaryWriter(File.Create(NamePKG));
             int DictCount = 1;
-            //byte[] LastNonNullChunk = new byte[0x40000];
-            byte[] Nullspace = new byte[0x40000];
 
             foreach (KeyValuePair<long, long> Entry in MetaChunk)
             {
-                Console.Write($"\rProcessing {DictCount.ToString().PadLeft(ChunkPadding)} / {ChunkCount}...");                
-
-                // DEBUG remove before release
-                if (DictCount == 633)
-                {
-                    break;
-                }
+                Console.Write($"\rProcessing {DictCount.ToString().PadLeft(ChunkPadding)} / {ChunkCount}...");
                 if (Entry.Value != 0)
                 {
                     Reader.BaseStream.Seek(Entry.Key, SeekOrigin.Begin);
                     byte[] ChunkCompressed = Reader.ReadBytes((int)Entry.Value); // Unsafe cast
-                    byte[] ChunkDecompressed = Program.Decompress(ChunkCompressed, ChunkCompressed.Length, 0x40000);
-                    //LastNonNullChunk = ChunkDecompressed;
+                    byte[] ChunkDecompressed = Utils.Decompress(ChunkCompressed, ChunkCompressed.Length, 0x40000);
                     Writer.Write(ChunkDecompressed);
                 }
                 else
                 {
-                    //Writer.Write(LastNonNullChunk);
-                    Writer.Write(Nullspace);
+                    Reader.BaseStream.Seek(Entry.Key, SeekOrigin.Begin);
+                    byte[] ChunkDecompressed = Reader.ReadBytes(0x40000);
+                    Writer.Write(ChunkDecompressed);
                 }
                 DictCount++;
             }

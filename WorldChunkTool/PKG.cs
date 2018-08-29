@@ -16,7 +16,7 @@ namespace WorldChunkTool
         {
             Dictionary<string, int> AffectedFiles = new Dictionary<string, int>();
             BinaryReader Reader = new BinaryReader(File.Open(FileInput, FileMode.Open));
-            StreamWriter LogWriter = new StreamWriter("pkg.csv", false);
+            StreamWriter LogWriter = new StreamWriter($"{Path.GetFileNameWithoutExtension(FileInput)}.csv", false);
             LogWriter.WriteLine("Index,Offset,Size,EntryType,Unk,Directory,FileName,FileType");
 
             Reader.BaseStream.Seek(0x0C, SeekOrigin.Begin);
@@ -38,8 +38,6 @@ namespace WorldChunkTool
 
                 for (int j = 0; j < CountChildren; j++)
                 {
-                    //int NullCount = 0;
-                    int FileNullCount = 0;
                     Console.Write($"\rParent entry {(i + 1).ToString().PadLeft(ParentPadding)}/{TotalParentCount}. Processing child entry {(j + 1).ToString().PadLeft(4)} / {CountChildren.ToString().PadLeft(4)}...");
 
                     long ReaderPositionSubFile = Reader.BaseStream.Position;
@@ -62,34 +60,11 @@ namespace WorldChunkTool
                         long ReaderPositionBeforeEntry = Reader.BaseStream.Position;
                         Reader.BaseStream.Seek(FileOffset, SeekOrigin.Begin);
                         byte[] ArrayFileData = Reader.ReadBytes(Convert.ToInt32(FileSize));
-                        /*foreach (byte Byte in ArrayFileData)
-                        {
-                            if (NullCount == 0x40000)
-                            {
-                                FileNullCount++;
-                                NullCount = 0;
-                            }
-                            if (Byte == 0)
-                            {
-                                NullCount++;
-                            }
-                            else
-                            {
-                                NullCount = 0;
-                            }
-                        }*/
-                        // DEBUG remove before release
-                        /*if (ArrayFileData.Length < FileSize)
-                        {
-                            return;
-                        }*/
-
-                        if (FileNullCount > 0) AffectedFiles.Add(StringNameParent, FileNullCount);
 
                         if (FlagPKGExtraction)
                         {
-                            new FileInfo(Environment.CurrentDirectory + "\\out\\" + StringNameParent).Directory.Create();
-                            File.WriteAllBytes(Environment.CurrentDirectory + "\\out\\" + StringNameParent, ArrayFileData);
+                            new FileInfo($"{Environment.CurrentDirectory}\\{Path.GetFileNameWithoutExtension(FileInput)}\\{StringNameParent}").Directory.Create();
+                            File.WriteAllBytes($"{Environment.CurrentDirectory}\\{Path.GetFileNameWithoutExtension(FileInput)}\\{StringNameParent}", ArrayFileData);
                         }
                         Reader.BaseStream.Seek(ReaderPositionBeforeEntry, SeekOrigin.Begin);
                     }
@@ -111,7 +86,6 @@ namespace WorldChunkTool
             }
             Reader.Close();
             LogWriter.Close();
-            using (StreamWriter WriterAffected = new StreamWriter(File.Create("affected.log"))) foreach (KeyValuePair<string, int> Entry in AffectedFiles) WriterAffected.WriteLine(string.Format("Affected: {0} ({1})", Entry.Key, (Entry.Value * 262144).ToString("X16")));
 
             Console.WriteLine("\n==============================");
             Console.WriteLine("Finished. Press Enter to quit.");
