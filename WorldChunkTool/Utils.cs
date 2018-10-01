@@ -30,5 +30,20 @@ namespace WorldChunkTool
                 throw new Exception("There was an error while decompressing.");
             }
         }
+
+        // Console printing helper
+        public static void Print(string Input, bool Before)
+        {
+            if (!Before)
+            {
+                Console.WriteLine(Input);
+                Console.WriteLine("==============================");
+            }
+            else
+            {
+                Console.WriteLine("\n==============================");
+                Console.WriteLine(Input);
+            }            
+        }
     }
 }

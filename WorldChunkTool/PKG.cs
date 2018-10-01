@@ -3,7 +3,6 @@
 // Excuse the lack of comments.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,7 +13,7 @@ namespace WorldChunkTool
     {
         public static void ExtractPKG(string FileInput, bool FlagPKGExtraction)
         {
-            Dictionary<string, int> AffectedFiles = new Dictionary<string, int>();
+            string OutputDirectory = $"{Environment.CurrentDirectory}\\{Path.GetFileNameWithoutExtension(FileInput)}";
             BinaryReader Reader = new BinaryReader(File.Open(FileInput, FileMode.Open));
             StreamWriter LogWriter = new StreamWriter($"{Path.GetFileNameWithoutExtension(FileInput)}.csv", false);
             LogWriter.WriteLine("Index,Offset,Size,EntryType,Unk,Directory,FileName,FileType");
@@ -23,8 +22,7 @@ namespace WorldChunkTool
             int TotalParentCount = Reader.ReadInt32();
             int ParentPadding = TotalParentCount.ToString().Length;
             int TotalChildrenCount = Reader.ReadInt32();
-            Console.WriteLine($"PKG file has {TotalParentCount} parent entries with {TotalChildrenCount} children entries.");
-            Console.WriteLine("==============================");
+            Utils.Print($"PKG file has {TotalParentCount} parent entries with {TotalChildrenCount} children entries.", false);
 
             Reader.BaseStream.Seek(0x100, SeekOrigin.Begin);
             for (int i = 0; i < TotalParentCount; i++)
@@ -47,6 +45,7 @@ namespace WorldChunkTool
                     EntryType = Reader.ReadInt32();
                     int Unknown = Reader.ReadInt32();
 
+                    // Proper up remapped files
                     if (EntryType == 0x02)
                     {
                         Reader.BaseStream.Seek(ReaderPositionSubFile, SeekOrigin.Begin);
@@ -55,6 +54,7 @@ namespace WorldChunkTool
                     }
                     StringNameParent = Encoding.UTF8.GetString(ArrayNameChild);
 
+                    // Extract remapped and regular files
                     if (EntryType == 0x02 || EntryType == 0x00)
                     {
                         long ReaderPositionBeforeEntry = Reader.BaseStream.Position;
@@ -63,12 +63,13 @@ namespace WorldChunkTool
 
                         if (FlagPKGExtraction)
                         {
-                            new FileInfo($"{Environment.CurrentDirectory}\\{Path.GetFileNameWithoutExtension(FileInput)}\\{StringNameParent}").Directory.Create();
-                            File.WriteAllBytes($"{Environment.CurrentDirectory}\\{Path.GetFileNameWithoutExtension(FileInput)}\\{StringNameParent}", ArrayFileData);
+                            new FileInfo($"{OutputDirectory}\\{StringNameParent}").Directory.Create();
+                            File.WriteAllBytes($"{OutputDirectory}\\{StringNameParent}", ArrayFileData);
                         }
                         Reader.BaseStream.Seek(ReaderPositionBeforeEntry, SeekOrigin.Begin);
                     }
 
+                    // Handle directory entries
                     if (EntryType != 0x01)
                     {
                         LogWriter.WriteLine(
@@ -87,8 +88,9 @@ namespace WorldChunkTool
             Reader.Close();
             LogWriter.Close();
 
-            Console.WriteLine("\n==============================");
-            Console.WriteLine("Finished. Press Enter to quit.");
+            Utils.Print("Finished.", true);
+            Utils.Print($"Output at: {OutputDirectory}", false);
+            Console.WriteLine("Press Enter to quit");
         }
     }
 }

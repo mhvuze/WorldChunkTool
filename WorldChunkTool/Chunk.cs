@@ -17,8 +17,7 @@ namespace WorldChunkTool
             // Read header
             Reader.BaseStream.Seek(4, SeekOrigin.Begin);
             int ChunkCount = Reader.ReadInt32(); int ChunkPadding = ChunkCount.ToString().Length;
-            Console.WriteLine($"{ChunkCount} chunks in this file.");
-            Console.WriteLine("==============================");
+            Utils.Print($"{ChunkCount} chunks in this file.", false);
 
             // Read file list
             for (int i = 0; i < ChunkCount; i++)
@@ -66,10 +65,8 @@ namespace WorldChunkTool
             Reader.Close();
             Writer.Close();
 
-            Console.WriteLine("\n==============================");
-            Console.WriteLine("Finished.");
-            Console.WriteLine($"Output at: {NamePKG}");
-            Console.WriteLine("==============================");
+            Utils.Print("Finished.", true);
+            Utils.Print($"Output at: {NamePKG}", false);
             Console.WriteLine("The PKG file will now be extracted. Press Enter to continue or close window to quit.");
             Console.Read();
 

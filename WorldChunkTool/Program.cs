@@ -15,8 +15,8 @@ namespace WorldChunkTool
             string StrPKGExtraction = "";
             bool FlagPKGExtraction = true;
 
-            Console.WriteLine("WorldChunkTool v1.1 by MHVuze");
             Console.WriteLine("==============================");
+            Utils.Print("WorldChunkTool v1.1.1 by MHVuze", false);            
 
             // Display commands
             if (args.Length == 0)
@@ -36,10 +36,26 @@ namespace WorldChunkTool
             if (StrPKGExtraction.Equals("false", StringComparison.InvariantCultureIgnoreCase)) { FlagPKGExtraction = false; Console.WriteLine("PKG extraction turned off."); }
 
             // Determine action based on file magic
-            using (BinaryReader Reader = new BinaryReader(File.Open(FileInput, FileMode.Open))) MagicInputFile = Reader.ReadInt32();
-            if (MagicInputFile == MagicChunk) { Console.WriteLine("Chunk file detected."); Chunk.DecompressChunks(FileInput, FlagPKGExtraction); Console.Read(); }
-            else if (MagicInputFile == MagicPKG) { Console.WriteLine("PKG file detected."); PKG.ExtractPKG(FileInput, FlagPKGExtraction); Console.Read(); }
-            else { Console.WriteLine($"Invalid magic {MagicInputFile.ToString("X8")}."); Console.Read(); return; }
+            try
+            {
+                using (BinaryReader Reader = new BinaryReader(File.Open(FileInput, FileMode.Open))) MagicInputFile = Reader.ReadInt32();
+                if (MagicInputFile == MagicChunk)
+                {
+                    Console.WriteLine("Chunk file detected.");
+                    if (!File.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\oo2core_5_win64.dll")) { Console.WriteLine("ERROR: oo2core_5_win64.dll is missing. Can't decompress chunk file."); Console.Read(); return; }
+                    Chunk.DecompressChunks(FileInput, FlagPKGExtraction);
+                    Console.Read();
+                }
+                else if (MagicInputFile == MagicPKG) { Console.WriteLine("PKG file detected."); PKG.ExtractPKG(FileInput, FlagPKGExtraction); Console.Read(); }
+                else { Console.WriteLine($"ERROR: Invalid magic {MagicInputFile.ToString("X8")}."); Console.Read(); return; }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("ERROR: The following exception was caught.");
+                Console.WriteLine(e);
+                Console.Read();
+                return;
+            }
         }
     }
 }
