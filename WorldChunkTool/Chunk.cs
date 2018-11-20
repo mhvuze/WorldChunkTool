@@ -30,6 +30,7 @@ namespace WorldChunkTool
                 ArrayChunkSize[0] = BitConverter.GetBytes(High)[0];
                 Array.Copy(ArrayChunkSize, ArrayTmp1, ArrayChunkSize.Length);
                 long ChunkSize = BitConverter.ToInt64(ArrayTmp1, 0);
+                ChunkSize = (ChunkSize >> 4) + (ChunkSize & 0xF);
 
                 // Process offset
                 byte[] ArrayTmp2 = new byte[8];
