@@ -11,7 +11,7 @@ namespace WorldChunkTool
 {
     class PKG
     {
-        public static void ExtractPKG(string FileInput, bool FlagPKGExtraction)
+        public static void ExtractPKG(string FileInput, bool FlagPKGExtraction, bool FlagAutoConfirm)
         {
             string OutputDirectory = $"{Environment.CurrentDirectory}\\{Path.GetFileNameWithoutExtension(FileInput)}";
             BinaryReader Reader = new BinaryReader(File.Open(FileInput, FileMode.Open));
@@ -90,7 +90,7 @@ namespace WorldChunkTool
 
             Utils.Print("Finished.", true);
             Utils.Print($"Output at: {OutputDirectory}", false);
-            Console.WriteLine("Press Enter to quit");
+            if (!FlagAutoConfirm) { Console.WriteLine("Press Enter to quit"); }
         }
     }
 }

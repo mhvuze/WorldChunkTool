@@ -6,7 +6,7 @@ namespace WorldChunkTool
 {
     class Chunk
     {
-        public static void DecompressChunks(String FileInput, bool FlagPKGExtraction)
+        public static void DecompressChunks(String FileInput, bool FlagPKGExtraction, bool FlagAutoConfirm)
         {
             string NamePKG = $"{Environment.CurrentDirectory}\\{Path.GetFileNameWithoutExtension(FileInput)}.pkg";
             BinaryReader Reader = new BinaryReader(File.Open(FileInput, FileMode.Open));
@@ -68,13 +68,16 @@ namespace WorldChunkTool
 
             Utils.Print("Finished.", true);
             Utils.Print($"Output at: {NamePKG}", false);
-            Console.WriteLine("The PKG file will now be extracted. Press Enter to continue or close window to quit.");
-            Console.Read();
+            
+            if (!FlagAutoConfirm) {
+                Console.WriteLine("The PKG file will now be extracted. Press Enter to continue or close window to quit.");
+                Console.Read();
+            }
 
             Console.SetCursorPosition(0, Console.CursorTop - 1);
             Console.WriteLine("==============================");
-            PKG.ExtractPKG(NamePKG, FlagPKGExtraction);
-            Console.Read();
+            PKG.ExtractPKG(NamePKG, FlagPKGExtraction, FlagAutoConfirm);
+            if (!FlagAutoConfirm) { Console.Read(); }
         }
     }
 }

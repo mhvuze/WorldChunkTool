@@ -13,7 +13,9 @@ namespace WorldChunkTool
 
             string FileInput = "";
             string StrPKGExtraction = "";
+            string AutoConfirm = "";
             bool FlagPKGExtraction = true;
+            bool FlagAutoConfirm = false;
 
             Console.WriteLine("==============================");
             Utils.Print("WorldChunkTool v1.1.1 by MHVuze", false);            
@@ -21,8 +23,9 @@ namespace WorldChunkTool
             // Display commands
             if (args.Length == 0)
             {                
-                Console.WriteLine("Usage: WorldChunkTool <chunkN_file|PKG_file> (PKGext)");
+                Console.WriteLine("Usage: WorldChunkTool <chunkN_file|PKG_file> (PKGext) (AutoConf)");
                 Console.WriteLine("PKGext: use 'false' to turn off PKG file extraction, defaults to 'true'");
+                Console.WriteLine("AutoConf: Use 'true' to bypass confirmation prompts, defaults to 'false'");
                 Console.Read();
                 return;
             }
@@ -35,6 +38,11 @@ namespace WorldChunkTool
             if (args.Length > 1) StrPKGExtraction = args[1];
             if (StrPKGExtraction.Equals("false", StringComparison.InvariantCultureIgnoreCase)) { FlagPKGExtraction = false; Console.WriteLine("PKG extraction turned off."); }
 
+            // Accept confirmation prompts
+            if (args.Length > 2) AutoConfirm = args[2];
+            if (AutoConfirm.Equals("true", StringComparison.InvariantCultureIgnoreCase)) { FlagAutoConfirm = true; Console.WriteLine("Auto Confirmation turned on."); }
+
+
             // Determine action based on file magic
             try
             {
@@ -42,18 +50,34 @@ namespace WorldChunkTool
                 if (MagicInputFile == MagicChunk)
                 {
                     Console.WriteLine("Chunk file detected.");
-                    if (!File.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\oo2core_5_win64.dll")) { Console.WriteLine("ERROR: oo2core_5_win64.dll is missing. Can't decompress chunk file."); Console.Read(); return; }
-                    Chunk.DecompressChunks(FileInput, FlagPKGExtraction);
-                    Console.Read();
+                    if (!File.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\oo2core_5_win64.dll")) {
+                        Console.WriteLine("ERROR: oo2core_5_win64.dll is missing. Can't decompress chunk file.");
+                        if (!FlagAutoConfirm) { Console.Read(); }
+                        return;
+                    }
+                    Chunk.DecompressChunks(FileInput, FlagPKGExtraction, FlagAutoConfirm);
+                    if (!FlagAutoConfirm) { Console.Read(); }
+                    return;
                 }
-                else if (MagicInputFile == MagicPKG) { Console.WriteLine("PKG file detected."); PKG.ExtractPKG(FileInput, FlagPKGExtraction); Console.Read(); }
-                else { Console.WriteLine($"ERROR: Invalid magic {MagicInputFile.ToString("X8")}."); Console.Read(); return; }
+                else if (MagicInputFile == MagicPKG) 
+                {
+                    Console.WriteLine("PKG file detected.");
+                    PKG.ExtractPKG(FileInput, FlagPKGExtraction, FlagAutoConfirm);
+                    if (!FlagAutoConfirm) { Console.Read(); }
+                    return;
+                }
+                else 
+                {
+                    Console.WriteLine($"ERROR: Invalid magic {MagicInputFile.ToString("X8")}.");
+                    if (!FlagAutoConfirm) { Console.Read(); }
+                    return;
+                }
             }
             catch (Exception e)
             {
                 Console.WriteLine("ERROR: The following exception was caught.");
                 Console.WriteLine(e);
-                Console.Read();
+                if (!FlagAutoConfirm) { Console.Read(); }
                 return;
             }
         }
