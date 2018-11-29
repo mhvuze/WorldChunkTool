@@ -4,9 +4,11 @@ Tool to decompress Monster Hunter: World chunkN.bin files and extract the result
 ```
 WorldChunkTool by MHVuze
 
-Usage: WorldChunkTool <chunkN_file|PKG_file> (PKGext)
+Usage: WorldChunkTool <chunkN_file|PKG_file> (PKGext) (AutoConf)
 
 PKGext: use 'false' to turn off PKG file extraction, defaults to 'true'
+
+AutoConf: Use 'true' to bypass confirmation prompts, defaults to 'false'
 ```
 
 *oo2core_5_win64.dll* required. Copy it from the install directory of Monster Hunter: World to the same folder as the WorldChunkTool executable.
