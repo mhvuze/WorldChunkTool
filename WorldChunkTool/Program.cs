@@ -5,7 +5,7 @@ namespace WorldChunkTool
 {
     class Program
     {
-        /* Error Codes:
+        /* Exit Codes:
          * 0 - No error
          * 1 - Input file missing
          * 2 - oo2core_5_win64.dll file missing
