@@ -24,7 +24,7 @@ namespace WorldChunkTool
             bool FlagAutoConfirm = false;
 
             Console.WriteLine("==============================");
-            Utils.Print("WorldChunkTool v1.1.1 by MHVuze", false);            
+            Utils.Print("WorldChunkTool v1.1.2 by MHVuze", false);            
 
             // Display commands
             if (args.Length == 0)
