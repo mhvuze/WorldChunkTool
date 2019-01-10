@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 namespace WorldChunkTool
 {
@@ -11,6 +12,7 @@ namespace WorldChunkTool
          * 2 - oo2core_5_win64.dll file missing
          * 3 - Other exception
          */
+
         static int Main(string[] args)
         {
             int MagicChunk = 0x00504D43;
@@ -18,20 +20,19 @@ namespace WorldChunkTool
             int MagicInputFile;
 
             string FileInput = "";
-            string StrPKGExtraction = "";
-            string AutoConfirm = "";
             bool FlagPKGExtraction = true;
             bool FlagAutoConfirm = false;
 
             Console.WriteLine("==============================");
-            Utils.Print("WorldChunkTool v1.1.2 by MHVuze", false);            
+            Utils.Print("WorldChunkTool v1.1.3 by MHVuze", false);            
 
             // Display commands
             if (args.Length == 0)
             {                
-                Console.WriteLine("Usage: WorldChunkTool <chunkN_file|PKG_file> (PKGext) (AutoConf)");
-                Console.WriteLine("PKGext: use 'false' to turn off PKG file extraction, defaults to 'true'");
-                Console.WriteLine("AutoConf: Use 'true' to bypass confirmation prompts, defaults to 'false'");
+                Console.WriteLine("Usage: \tWorldChunkTool <chunkN_file|PKG_file> (options)\n");
+                Console.WriteLine("Options:");
+                Console.WriteLine("\t-PkgOnly: Only decompress the PKG file. No further extraction.");
+                Console.WriteLine("\t-AutoConfirm: No confirmation required to extract the PKG file.");
                 Console.Read();
                 return 0;
             }
@@ -40,14 +41,9 @@ namespace WorldChunkTool
             FileInput = args[0];
             if (!File.Exists(FileInput)) { Console.WriteLine("ERROR: Specified file doesn't exist."); Console.Read(); return 1; }
 
-            // Turn PKG extraction output on or off
-            if (args.Length > 1) StrPKGExtraction = args[1];
-            if (StrPKGExtraction.Equals("false", StringComparison.InvariantCultureIgnoreCase)) { FlagPKGExtraction = false; Console.WriteLine("PKG extraction turned off."); }
-
-            // Accept confirmation prompts
-            if (args.Length > 2) AutoConfirm = args[2];
-            if (AutoConfirm.Equals("true", StringComparison.InvariantCultureIgnoreCase)) { FlagAutoConfirm = true; Console.WriteLine("Auto Confirmation turned on."); }
-
+            // Set options
+            if (args.Any("-PkgOnly".Contains)) { FlagPKGExtraction = true; Console.WriteLine("PKG extraction turned off."); }
+            if (args.Any("-AutoConfirm".Contains)) { FlagAutoConfirm = true; Console.WriteLine("Auto confirmation turned on."); }
 
             // Determine action based on file magic
             try
