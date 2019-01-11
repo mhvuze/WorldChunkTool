@@ -11,12 +11,13 @@ namespace WorldChunkTool
 {
     class PKG
     {
-        public static void ExtractPKG(string FileInput, bool FlagPKGExtraction, bool FlagAutoConfirm)
+        public static void ExtractPKG(string FileInput, bool FlagPKGExtraction, bool FlagAutoConfirm, bool FlagUnpackAll, bool FlagPKGDelete)
         {
             string OutputDirectory = $"{Environment.CurrentDirectory}\\{Path.GetFileNameWithoutExtension(FileInput)}";
+            if (FlagUnpackAll) OutputDirectory = $"{Environment.CurrentDirectory}\\chunk";
             BinaryReader Reader = new BinaryReader(File.Open(FileInput, FileMode.Open));
             StreamWriter LogWriter = new StreamWriter($"{Path.GetFileNameWithoutExtension(FileInput)}.csv", false);
-            LogWriter.WriteLine("Index,Offset,Size,EntryType,Unk,Directory,FileName,FileType");
+            LogWriter.WriteLine("Index,Offset,Size,EntryType,Unk,FullPath,Directory,FileName,FileType");
 
             Reader.BaseStream.Seek(0x0C, SeekOrigin.Begin);
             int TotalParentCount = Reader.ReadInt32();
@@ -78,6 +79,7 @@ namespace WorldChunkTool
                             FileSize + "," +
                             EntryType + "," +
                             Unknown + "," +
+                            StringNameParent + "," +
                             StringNameParent.Remove(StringNameParent.LastIndexOf('\\') + 1) + "," +
                             StringNameParent.Substring(StringNameParent.LastIndexOf('\\') + 1) + "," +
                             StringNameParent.Substring(StringNameParent.IndexOf('.') + 1)
@@ -87,6 +89,7 @@ namespace WorldChunkTool
             }
             Reader.Close();
             LogWriter.Close();
+            if (FlagPKGDelete) File.Delete(FileInput);
 
             Utils.Print("Finished.", true);
             Utils.Print($"Output at: {OutputDirectory}", false);
