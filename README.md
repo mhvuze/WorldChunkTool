@@ -3,11 +3,13 @@ Tool to decompress Monster Hunter: World chunkN.bin files and extract the result
 
 ```
 ==============================
-WorldChunkTool v1.1.3 by MHVuze
+WorldChunkTool v1.1.4 by MHVuze
 ==============================
-Usage:  WorldChunkTool <chunkN_file|PKG_file> (options)
+Usage:  WorldChunkTool <chunkN_file|PKG_file|chunkN_dir> (options)
 
 Options:
+        -UnpackAll: Unpack all chunkN.bin files in the provided directory into a single folder.
+        -PkgDelete: Delete PKG file after extraction.
         -PkgOnly: Only decompress the PKG file. No further extraction.
         -AutoConfirm: No confirmation required to extract the PKG file.
 ```
