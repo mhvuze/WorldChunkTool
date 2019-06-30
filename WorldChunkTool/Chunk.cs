@@ -9,7 +9,7 @@ namespace WorldChunkTool
         public static void DecompressChunks(String FileInput, bool FlagPKGExtraction, bool FlagAutoConfirm, bool FlagUnpackAll, bool FlagPKGDelete)
         {
             string NamePKG = $"{Environment.CurrentDirectory}\\{Path.GetFileNameWithoutExtension(FileInput)}.pkg";
-            BinaryReader Reader = new BinaryReader(File.Open(FileInput, FileMode.Open));
+            BinaryReader Reader = new BinaryReader(File.Open(FileInput, FileMode.Open, FileAccess.Read, FileShare.Read));
 
             // Key = ChunkOffset, Value = ChunkSize
             Dictionary<long, long> MetaChunk = new Dictionary<long, long>();
