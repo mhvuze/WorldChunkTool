@@ -26,14 +26,14 @@ namespace WorldChunkTool
         static int Main(string[] args)
         {
             Console.WriteLine("==============================");
-            Utils.Print("WorldChunkTool v1.1.4 by MHVuze", false);            
+            Utils.Print("WorldChunkTool v1.2 by MHVuze", false);            
 
             // Display commands
             if (args.Length == 0)
             {                
-                Console.WriteLine("Usage: \tWorldChunkTool <chunkN_file|PKG_file|chunkN_dir> (options)\n");
+                Console.WriteLine("Usage: \tWorldChunkTool <chunk*_file|PKG_file|chunk*_dir> (options)\n");
                 Console.WriteLine("Options:");
-                Console.WriteLine("\t-UnpackAll: Unpack all chunkN.bin files in the provided directory into a single folder.");
+                Console.WriteLine("\t-UnpackAll: Unpack all chunk*.bin files in the provided directory into a single folder.");
                 Console.WriteLine("\t-PkgDelete: Delete PKG file after extraction.");
                 Console.WriteLine("\t-PkgOnly: Only decompress the PKG file. No further extraction.");
                 Console.WriteLine("\t-AutoConfirm: No confirmation required to extract the PKG file.");
@@ -46,7 +46,7 @@ namespace WorldChunkTool
             // Set options
             if (args.Any("-PkgOnly".Contains)) { FlagPKGExtraction = true; Console.WriteLine("PKG extraction turned off."); }
             if (args.Any("-AutoConfirm".Contains)) { FlagAutoConfirm = true; Console.WriteLine("Auto confirmation turned on."); }
-            if (args.Any("-UnpackAll".Contains)) { FlagUnpackAll = true; Console.WriteLine("Unpacking all chunkN.bin files into a single folder."); }
+            if (args.Any("-UnpackAll".Contains)) { FlagUnpackAll = true; Console.WriteLine("Unpacking all chunk*.bin files into a single folder."); }
             if (args.Any("-PkgDelete".Contains)) { FlagPKGDelete = true; Console.WriteLine("Deleting PKG file after extraction."); }
 
             // Determine action based on file magic
@@ -54,7 +54,8 @@ namespace WorldChunkTool
             {
                 if (FlagUnpackAll && File.GetAttributes(FileInput).HasFlag(FileAttributes.Directory))
                 {
-                    string[] ChunkFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "chunk*.bin", SearchOption.TopDirectoryOnly);
+                    // MHW: Base Game
+                    string[] ChunkFiles = Directory.GetFiles(FileInput, "chunk*.bin", SearchOption.TopDirectoryOnly).CustomSort().ToArray();
                     foreach (string ChunkFile in ChunkFiles) { Console.WriteLine($"Processing {ChunkFile}."); ProcessFile(ChunkFile); }
                 }
                 else  ProcessFile(FileInput);
