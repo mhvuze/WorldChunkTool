@@ -72,7 +72,7 @@ namespace WorldChunkTool
         static int ProcessFile(string FileInput)
         {
             if (!File.Exists(FileInput)) { Console.WriteLine("ERROR: Specified file doesn't exist."); Console.Read(); return 1; }
-            using (BinaryReader Reader = new BinaryReader(File.Open(FileInput, FileMode.Open))) MagicInputFile = Reader.ReadInt32();
+            using (BinaryReader Reader = new BinaryReader(File.Open(FileInput, FileMode.Open, FileAccess.Read, FileShare.Read))) MagicInputFile = Reader.ReadInt32();
             if (MagicInputFile == MagicChunk)
             {
                 Console.WriteLine("Chunk file detected.");
