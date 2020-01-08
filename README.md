@@ -1,4 +1,7 @@
 # WorldChunkTool
+
+**Please note:** There was an encryption layer added to Iceborne chunks. They cannot be extracted until this is adressed. The repo will be updated asap when a proper way of handling it was figured out.
+
 Tool to decompress Monster Hunter: World chunk*.bin files and extract the resulting PKG file.
 
 ```
@@ -17,7 +20,3 @@ Options:
 *oo2core_5_win64.dll* required. Copy it from the install directory of Monster Hunter: World to the same folder as the WorldChunkTool executable.
 
 **Warning:** You need A LOT of space to decompress huge chunkN.bin files. To be sure, calculate 3 * chunk*.bin size.
-
-Changes:
-- readonly support
-- fixed order for UnpackAll
