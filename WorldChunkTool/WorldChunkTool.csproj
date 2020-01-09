@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Chunk.cs" />
+    <Compile Include="ChunkOTF.cs" />
     <Compile Include="PKG.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -11,7 +11,7 @@ namespace WorldChunkTool
 {
     class PKG
     {
-        public static void ExtractPKG(string FileInput, bool FlagPKGExtraction, bool FlagAutoConfirm, bool FlagUnpackAll, bool FlagPKGDelete)
+        public static void ExtractPKG(string FileInput, bool FlagAutoConfirm, bool FlagUnpackAll)
         {
             string OutputDirectory = $"{Environment.CurrentDirectory}\\{Path.GetFileNameWithoutExtension(FileInput)}";
             if (FlagUnpackAll) OutputDirectory = $"{Environment.CurrentDirectory}\\chunk";
@@ -62,11 +62,9 @@ namespace WorldChunkTool
                         Reader.BaseStream.Seek(FileOffset, SeekOrigin.Begin);
                         byte[] ArrayFileData = Reader.ReadBytes(Convert.ToInt32(FileSize));
 
-                        if (FlagPKGExtraction)
-                        {
-                            new FileInfo($"{OutputDirectory}\\{StringNameParent}").Directory.Create();
-                            File.WriteAllBytes($"{OutputDirectory}\\{StringNameParent}", ArrayFileData);
-                        }
+                        new FileInfo($"{OutputDirectory}\\{StringNameParent}").Directory.Create();
+                        File.WriteAllBytes($"{OutputDirectory}\\{StringNameParent}", ArrayFileData);
+
                         Reader.BaseStream.Seek(ReaderPositionBeforeEntry, SeekOrigin.Begin);
                     }
 
@@ -89,7 +87,6 @@ namespace WorldChunkTool
             }
             Reader.Close();
             LogWriter.Close();
-            if (FlagPKGDelete) File.Delete(FileInput);
 
             Utils.Print("Finished.", true);
             Utils.Print($"Output at: {OutputDirectory}", false);

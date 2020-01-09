@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -18,10 +19,10 @@ namespace WorldChunkTool
         static int MagicInputFile;
 
         static string FileInput = "";
-        static bool FlagPKGExtraction = true;
+        static bool FlagBuildPkg = false;
+        static bool FlagBaseGame = false;
         static bool FlagAutoConfirm = false;
         static bool FlagUnpackAll = false;
-        static bool FlagPKGDelete = false;
 
         static int Main(string[] args)
         {
@@ -34,9 +35,9 @@ namespace WorldChunkTool
                 Console.WriteLine("Usage: \tWorldChunkTool <chunk*_file|PKG_file|chunk*_dir> (options)\n");
                 Console.WriteLine("Options:");
                 Console.WriteLine("\t-UnpackAll: Unpack all chunk*.bin files in the provided directory into a single folder.");
-                Console.WriteLine("\t-PkgDelete: Delete PKG file after extraction.");
-                Console.WriteLine("\t-PkgOnly: Only decompress the PKG file. No further extraction.");
-                Console.WriteLine("\t-AutoConfirm: No confirmation required to extract the PKG file.");
+                Console.WriteLine("\t-AutoConfirm: No confirmations required.");
+                Console.WriteLine("\t-BuildPKG: Build PKG file from chunks and create data sheet. No extraction. For research purposes only.");
+                Console.WriteLine("\t-BaseGame: Switch to legacy mode for MH:W base game chunks.");
                 Console.Read();
                 return 0;
             }
@@ -44,10 +45,10 @@ namespace WorldChunkTool
             FileInput = args[0];            
 
             // Set options
-            if (args.Any("-PkgOnly".Contains)) { FlagPKGExtraction = true; Console.WriteLine("PKG extraction turned off."); }
-            if (args.Any("-AutoConfirm".Contains)) { FlagAutoConfirm = true; Console.WriteLine("Auto confirmation turned on."); }
-            if (args.Any("-UnpackAll".Contains)) { FlagUnpackAll = true; Console.WriteLine("Unpacking all chunk*.bin files into a single folder."); }
-            if (args.Any("-PkgDelete".Contains)) { FlagPKGDelete = true; Console.WriteLine("Deleting PKG file after extraction."); }
+            if (args.Any("-AutoConfirm".Contains)) { FlagAutoConfirm = true; Utils.Print("Auto confirmation turned on.", false); }
+            if (args.Any("-UnpackAll".Contains)) { FlagUnpackAll = true; FlagAutoConfirm = true; Utils.Print("Unpacking all chunk*.bin files into a single folder.", false); }
+            if (args.Any("-BuildPKG".Contains)) { FlagBuildPkg = true; Utils.Print("Building PKG.", false); }
+            if (args.Any("-BaseGame".Contains)) { FlagBaseGame = true; Utils.Print("Using legacy mode for MH:W base game chunks.", false); }
 
             // Determine action based on file magic
             try
@@ -58,7 +59,8 @@ namespace WorldChunkTool
                     string[] ChunkFiles = Directory.GetFiles(FileInput, "chunk*.bin", SearchOption.TopDirectoryOnly).CustomSort().ToArray();
                     foreach (string ChunkFile in ChunkFiles) { Console.WriteLine($"Processing {ChunkFile}."); ProcessFile(ChunkFile); }
                 }
-                else  ProcessFile(FileInput);
+                else ProcessFile(FileInput);
+                if (FlagUnpackAll) { Console.WriteLine($"Output at: {Environment.CurrentDirectory}\\chunk_combined"); Console.WriteLine("Press Enter to quit"); Console.Read(); }
                 return 0;
             }
             catch (Exception e)
@@ -77,20 +79,37 @@ namespace WorldChunkTool
             if (MagicInputFile == MagicChunk)
             {
                 Console.WriteLine("Chunk file detected.");
-                if (!File.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\oo2core_5_win64.dll"))
+                if (!File.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\oo2core_8_win64.dll"))
                 {
-                    Console.WriteLine("ERROR: oo2core_5_win64.dll is missing. Can't decompress chunk file.");
+                    Console.WriteLine("ERROR: oo2core_8_win64.dll is missing. Can't decompress chunk file.");
                     if (!FlagAutoConfirm) { Console.Read(); }
                     return 2;
                 }
-                Chunk.DecompressChunks(FileInput, FlagPKGExtraction, FlagAutoConfirm, FlagUnpackAll, FlagPKGDelete);
-                if (!FlagAutoConfirm) { Console.Read(); }
+
+                // Build PKG
+                if (FlagBuildPkg) { Chunk.DecompressChunks(FileInput, FlagAutoConfirm, FlagUnpackAll, FlagBaseGame); }
+                // On-the-fly decompression and unpacking
+                else
+                {
+                    ChunkOTF ChunkOtfInst = new ChunkOTF();
+                    List<FileNode> FileCatalog = new List<FileNode>();
+                    string FilePath = $"{Environment.CurrentDirectory}\\{Path.GetFileNameWithoutExtension(FileInput)}";
+                    if (FlagUnpackAll) { FilePath = $"{Environment.CurrentDirectory}\\chunk_combined"; }
+                    FileCatalog = ChunkOtfInst.AnalyzeChunk(FileInput, FileCatalog, FlagBaseGame);
+                    Console.WriteLine("Extracting chunk file, please wait.");
+                    ChunkOtfInst.ExtractSelected(FileCatalog, FilePath, FlagBaseGame);
+                    Utils.Print("\nFinished.", false);
+                    if (!FlagUnpackAll) { Console.WriteLine($"Output at: {FilePath}"); }
+                    if (!FlagAutoConfirm) { Console.WriteLine("Press Enter to quit"); }
+                    if (!FlagAutoConfirm) { Console.Read(); }
+                }
+
                 return 0;
             }
             else if (MagicInputFile == MagicPKG)
             {
                 Console.WriteLine("PKG file detected.");
-                PKG.ExtractPKG(FileInput, FlagPKGExtraction, FlagAutoConfirm, FlagUnpackAll, FlagPKGDelete);
+                PKG.ExtractPKG(FileInput, FlagAutoConfirm, FlagUnpackAll);
                 if (!FlagAutoConfirm) { Console.Read(); }
                 return 0;
             }

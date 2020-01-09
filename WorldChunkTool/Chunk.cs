@@ -6,7 +6,7 @@ namespace WorldChunkTool
 {
     class Chunk
     {
-        public static void DecompressChunks(String FileInput, bool FlagPKGExtraction, bool FlagAutoConfirm, bool FlagUnpackAll, bool FlagPKGDelete)
+        public static void DecompressChunks(String FileInput, bool FlagAutoConfirm, bool FlagUnpackAll, bool FlagBaseGame)
         {
             string NamePKG = $"{Environment.CurrentDirectory}\\{Path.GetFileNameWithoutExtension(FileInput)}.pkg";
             BinaryReader Reader = new BinaryReader(File.Open(FileInput, FileMode.Open, FileAccess.Read, FileShare.Read));
@@ -20,6 +20,7 @@ namespace WorldChunkTool
             Utils.Print($"{ChunkCount} chunks in this file.", false);
 
             // Read file list
+            long totalChunkSize = 0;
             for (int i = 0; i < ChunkCount; i++)
             {
                 // Process file size
@@ -31,6 +32,7 @@ namespace WorldChunkTool
                 Array.Copy(ArrayChunkSize, ArrayTmp1, ArrayChunkSize.Length);
                 long ChunkSize = BitConverter.ToInt64(ArrayTmp1, 0);
                 ChunkSize = (ChunkSize >> 4) + (ChunkSize & 0xF);
+                totalChunkSize += ChunkSize;
 
                 // Process offset
                 byte[] ArrayTmp2 = new byte[8];
@@ -39,7 +41,10 @@ namespace WorldChunkTool
                 long ChunkOffset = BitConverter.ToInt64(ArrayTmp2, 0);
 
                 MetaChunk.Add(ChunkOffset, ChunkSize);
+                Console.WriteLine((i + 1).ToString("D8") + "," + ChunkOffset + "," + ChunkSize);
             }
+            Console.WriteLine(totalChunkSize);
+            //SortedDictionary<long, long> sortedDict = new SortedDictionary<long, long>(MetaChunk);
 
             // Write decompressed chunks to pkg
             BinaryWriter Writer = new BinaryWriter(File.Create(NamePKG));
@@ -52,7 +57,20 @@ namespace WorldChunkTool
                 {
                     Reader.BaseStream.Seek(Entry.Key, SeekOrigin.Begin);
                     byte[] ChunkCompressed = Reader.ReadBytes((int)Entry.Value); // Unsafe cast
+                    //BinaryWriter Writer3 = new BinaryWriter(File.Create($"{Environment.CurrentDirectory}\\G60_cmp\\chunk_{DictCount.ToString("D8")}_cmp.bin"));
+                    //Writer3.Write(ChunkCompressed);
+                    //Writer3.Close();
+
                     byte[] ChunkDecompressed = Utils.Decompress(ChunkCompressed, ChunkCompressed.Length, 0x40000);
+                    //BinaryWriter Writer2 = new BinaryWriter(File.Create($"{Environment.CurrentDirectory}\\G60_decmp\\chunk_{DictCount.ToString("D8")}_decmp.bin"));
+                    //Writer2.Write(ChunkDecompressed);
+                    //Writer2.Close();
+
+                    if (!FlagBaseGame) { Utils.DecryptChunk(ChunkDecompressed, Utils.GetChunkKey(DictCount - 1)); }
+                    //BinaryWriter Writer4 = new BinaryWriter(File.Create($"{Environment.CurrentDirectory}\\G60_decrypt\\chunk_{DictCount.ToString("D8")}_decrypt.bin"));
+                    //Writer4.Write(ChunkDecompressed);
+                    //Writer4.Close();
+
                     Writer.Write(ChunkDecompressed);
                 }
                 else
@@ -68,16 +86,17 @@ namespace WorldChunkTool
 
             Utils.Print("Finished.", true);
             Utils.Print($"Output at: {NamePKG}", false);
-            
-            if (!FlagAutoConfirm) {
-                Console.WriteLine("The PKG file will now be extracted. Press Enter to continue or close window to quit.");
+
+            if (!FlagAutoConfirm)
+            {
+                Console.WriteLine("Press Enter to quit.");
                 Console.Read();
             }
 
-            Console.SetCursorPosition(0, Console.CursorTop - 1);
-            Console.WriteLine("==============================");
-            PKG.ExtractPKG(NamePKG, FlagPKGExtraction, FlagAutoConfirm, FlagUnpackAll, FlagPKGDelete);
-            if (!FlagAutoConfirm) { Console.Read(); }
+            Console.SetCursorPosition(0, Console.CursorTop - 1); // remove this
+            Console.WriteLine("=============================="); // remove this
+            PKG.ExtractPKG(NamePKG, FlagAutoConfirm, FlagUnpackAll); // remove this
+            if (!FlagAutoConfirm) { Console.Read(); } // remove this
         }
     }
 }
