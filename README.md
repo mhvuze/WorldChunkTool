@@ -18,7 +18,7 @@ Options:
 
 **WARNING:** Please be careful and don't download *oo2core_8_win64.dll* randomly from the web.
 
-Changes:
+Changes (TODO: format):
 - readonly support
 - fixed order for UnpackAll
 - on the fly jodo
@@ -26,4 +26,5 @@ Changes:
 - support for Iceborne
 - switch basegame
 - deleted pkg extract and pkg delete
-- credits: jodo, asterisk, Stracker
+- credits tool help: jodo, Asterisk, Stracker
+- credits crunching: XunLi, Kiranico, DMQW, Aradi147, MoonBunnie, Ice, Jodo, Dallagen, Miralis

@@ -45,6 +45,7 @@ namespace WorldChunkTool
 
             // Read file list
             DictCount = 0;
+            long totalChunkSize = 0;
             for (int i = 0; i < ChunkCount; i++)
             {
                 // Process file size
@@ -55,6 +56,7 @@ namespace WorldChunkTool
                 Array.Copy(ArrayChunkSize, ArrayTmp1, ArrayChunkSize.Length);
                 long ChunkSize = BitConverter.ToInt64(ArrayTmp1, 0);
                 ChunkSize = (ChunkSize >> 4) + (ChunkSize & 0xF);
+                totalChunkSize += ChunkSize;
 
                 // Process offset
                 byte[] ArrayTmp2 = new byte[8];
@@ -71,10 +73,10 @@ namespace WorldChunkTool
             long cur_offset = ChunkOffsetDict[cur_index];
             long cur_size = MetaChunk[cur_offset];
 
-            ChunkDecompressed = getDecompressedChunk(cur_offset, cur_size, Reader, FlagBaseGame);
+            ChunkDecompressed = getDecompressedChunk(cur_offset, cur_size, Reader, FlagBaseGame, cur_index);
             if (cur_index + 1 < DictCount)
             {
-                NextChunkDecompressed = getDecompressedChunk(ChunkOffsetDict[cur_index + 1], MetaChunk[ChunkOffsetDict[cur_index + 1]], Reader, FlagBaseGame);
+                NextChunkDecompressed = getDecompressedChunk(ChunkOffsetDict[cur_index + 1], MetaChunk[ChunkOffsetDict[cur_index + 1]], Reader, FlagBaseGame, cur_index + 1);
             }
             else
             {
@@ -209,7 +211,7 @@ namespace WorldChunkTool
                         else
                         {
                             if (CurNodeChunk.ChunkCache.Count > 20) CurNodeChunk.ChunkCache.Clear();
-                            CurNodeChunk.ChunkDecompressed = CurNodeChunk.getDecompressedChunk(CurNodeChunk.ChunkOffsetDict[CurNodeChunk.cur_index], CurNodeChunk.MetaChunk[CurNodeChunk.ChunkOffsetDict[CurNodeChunk.cur_index]], CurNodeChunk.Reader, FlagBaseGame);
+                            CurNodeChunk.ChunkDecompressed = CurNodeChunk.getDecompressedChunk(CurNodeChunk.ChunkOffsetDict[CurNodeChunk.cur_index], CurNodeChunk.MetaChunk[CurNodeChunk.ChunkOffsetDict[CurNodeChunk.cur_index]], CurNodeChunk.Reader, FlagBaseGame, CurNodeChunk.cur_index);
                             CurNodeChunk.ChunkCache.Add(CurNodeChunk.cur_index, CurNodeChunk.ChunkDecompressed);
                         }
                         if (CurNodeChunk.ChunkCache.ContainsKey(CurNodeChunk.cur_index + 1))
@@ -219,7 +221,7 @@ namespace WorldChunkTool
                         else
                         {
                             if (CurNodeChunk.ChunkCache.Count > 20) CurNodeChunk.ChunkCache.Clear();
-                            if (CurNodeChunk.cur_index + 1 < CurNodeChunk.DictCount) { CurNodeChunk.NextChunkDecompressed = CurNodeChunk.getDecompressedChunk(CurNodeChunk.ChunkOffsetDict[CurNodeChunk.cur_index + 1], CurNodeChunk.MetaChunk[CurNodeChunk.ChunkOffsetDict[CurNodeChunk.cur_index + 1]], CurNodeChunk.Reader, FlagBaseGame); }
+                            if (CurNodeChunk.cur_index + 1 < CurNodeChunk.DictCount) { CurNodeChunk.NextChunkDecompressed = CurNodeChunk.getDecompressedChunk(CurNodeChunk.ChunkOffsetDict[CurNodeChunk.cur_index + 1], CurNodeChunk.MetaChunk[CurNodeChunk.ChunkOffsetDict[CurNodeChunk.cur_index + 1]], CurNodeChunk.Reader, FlagBaseGame, CurNodeChunk.cur_index + 1); }
                             else { CurNodeChunk.NextChunkDecompressed = new byte[0]; }
                             CurNodeChunk.ChunkCache.Add(CurNodeChunk.cur_index + 1, CurNodeChunk.NextChunkDecompressed);
                         }
@@ -227,7 +229,7 @@ namespace WorldChunkTool
                         else new FileInfo(BaseLocation + node.EntireName).Directory.Create();
                         if (node.IsFile)
                         {
-                            Console.Write($"Extracting {node.EntireName} ...                 \r");
+                            Console.Write($"Extracting {node.EntireName} ...                          \r");
                             File.WriteAllBytes(BaseLocation + node.EntireName, CurNodeChunk.getOnLength(size, new byte[size], 0, FlagBaseGame));
                         }
                     }
@@ -243,14 +245,14 @@ namespace WorldChunkTool
         }
 
         //To get decompressed chunk
-        private byte[] getDecompressedChunk(long offset, long size, BinaryReader reader, bool FlagBaseGame)
+        private byte[] getDecompressedChunk(long offset, long size, BinaryReader reader, bool FlagBaseGame, int chunkNum)
         {
             if (size != 0)
             {
                 reader.BaseStream.Seek(offset, SeekOrigin.Begin);
                 byte[] ChunkCompressed = reader.ReadBytes((int)size); // Unsafe cast
                 byte[] ChunkDecompressed = Utils.Decompress(ChunkCompressed, ChunkCompressed.Length, 0x40000);
-                //if (!FlagBaseGame) { Utils.DecryptChunk(ChunkDecompressed, Utils.GetChunkKey(); }
+                if (!FlagBaseGame) { Utils.DecryptChunk(ChunkDecompressed, Utils.GetChunkKey(chunkNum)); }
                 return ChunkDecompressed;
             }
             else
@@ -294,7 +296,7 @@ namespace WorldChunkTool
                 cur_pointer = 0;
                 ChunkDecompressed = NextChunkDecompressed;
                 cur_index += 1;
-                if (cur_index + 1 < DictCount) { NextChunkDecompressed = getDecompressedChunk(ChunkOffsetDict[cur_index + 1], MetaChunk[ChunkOffsetDict[cur_index + 1]], Reader, FlagBaseGame); }
+                if (cur_index + 1 < DictCount) { NextChunkDecompressed = getDecompressedChunk(ChunkOffsetDict[cur_index + 1], MetaChunk[ChunkOffsetDict[cur_index + 1]], Reader, FlagBaseGame, cur_index + 1); }
                 else
                 {
                     NextChunkDecompressed = new byte[0];
