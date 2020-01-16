@@ -11,7 +11,7 @@ namespace WorldChunkTool
 {
     class PKG
     {
-        public static void ExtractPKG(string FileInput, bool FlagAutoConfirm, bool FlagUnpackAll)
+        public static void ExtractPKG(string FileInput, bool FlagAutoConfirm, bool FlagUnpackAll, bool OnlyLog)
         {
             string OutputDirectory = $"{Environment.CurrentDirectory}\\{Path.GetFileNameWithoutExtension(FileInput)}";
             if (FlagUnpackAll) OutputDirectory = $"{Environment.CurrentDirectory}\\chunk";
@@ -23,7 +23,7 @@ namespace WorldChunkTool
             int TotalParentCount = Reader.ReadInt32();
             int ParentPadding = TotalParentCount.ToString().Length;
             int TotalChildrenCount = Reader.ReadInt32();
-            Utils.Print($"PKG file has {TotalParentCount} parent entries with {TotalChildrenCount} children entries.", false);
+            if (!OnlyLog) Utils.Print($"PKG file has {TotalParentCount} parent entries with {TotalChildrenCount} children entries.", false);
 
             Reader.BaseStream.Seek(0x100, SeekOrigin.Begin);
             for (int i = 0; i < TotalParentCount; i++)
@@ -37,7 +37,7 @@ namespace WorldChunkTool
 
                 for (int j = 0; j < CountChildren; j++)
                 {
-                    Console.Write($"\rParent entry {(i + 1).ToString().PadLeft(ParentPadding)}/{TotalParentCount}. Processing child entry {(j + 1).ToString().PadLeft(4)} / {CountChildren.ToString().PadLeft(4)}...");
+                    if (!OnlyLog) Console.Write($"\rParent entry {(i + 1).ToString().PadLeft(ParentPadding)}/{TotalParentCount}. Processing child entry {(j + 1).ToString().PadLeft(4)} / {CountChildren.ToString().PadLeft(4)}...");
 
                     long ReaderPositionSubFile = Reader.BaseStream.Position;
                     byte[] ArrayNameChild = Reader.ReadBytes(0xA0).Where(b => b != 0x00).ToArray();
@@ -88,8 +88,8 @@ namespace WorldChunkTool
             Reader.Close();
             LogWriter.Close();
 
-            Utils.Print("Finished.", true);
-            Utils.Print($"Output at: {OutputDirectory}", false);
+            if (!OnlyLog) Utils.Print("Finished.", true);
+            if (!OnlyLog) Utils.Print($"Output at: {OutputDirectory}", false);
             if (!FlagAutoConfirm) { Console.WriteLine("Press Enter to quit"); }
         }
     }

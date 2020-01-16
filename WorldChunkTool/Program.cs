@@ -37,7 +37,7 @@ namespace WorldChunkTool
                 Console.WriteLine("\t-UnpackAll: Unpack all chunk*.bin files in the provided directory into a single folder.");
                 Console.WriteLine("\t-AutoConfirm: No confirmations required.");
                 Console.WriteLine("\t-BuildPKG: Build PKG file from chunks and create data sheet. No extraction. For research purposes only.");
-                Console.WriteLine("\t-BaseGame: Switch to legacy mode for MH:W base game chunks.");
+                Console.WriteLine("\t-BaseGame: Switch to legacy mode for MH:W base game chunks (pre-IB update).");
                 Console.Read();
                 return 0;
             }
@@ -99,7 +99,7 @@ namespace WorldChunkTool
                     Console.WriteLine("Extracting chunk file, please wait.");
                     ChunkOtfInst.ExtractSelected(FileCatalog, FilePath, FlagBaseGame);
                     Utils.Print("\nFinished.", false);
-                    if (!FlagUnpackAll) { Console.WriteLine($"Output at: {FilePath}"); }
+                    if (!FlagUnpackAll) { Utils.Print($"Output at: {FilePath}", false); }
                     if (!FlagAutoConfirm) { Console.WriteLine("Press Enter to quit"); }
                     if (!FlagAutoConfirm) { Console.Read(); }
                 }
@@ -109,7 +109,7 @@ namespace WorldChunkTool
             else if (MagicInputFile == MagicPKG)
             {
                 Console.WriteLine("PKG file detected.");
-                PKG.ExtractPKG(FileInput, FlagAutoConfirm, FlagUnpackAll);
+                PKG.ExtractPKG(FileInput, FlagAutoConfirm, FlagUnpackAll, false);
                 if (!FlagAutoConfirm) { Console.Read(); }
                 return 0;
             }

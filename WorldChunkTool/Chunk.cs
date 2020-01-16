@@ -41,10 +41,9 @@ namespace WorldChunkTool
                 long ChunkOffset = BitConverter.ToInt64(ArrayTmp2, 0);
 
                 MetaChunk.Add(ChunkOffset, ChunkSize);
-                Console.WriteLine((i + 1).ToString("D8") + "," + ChunkOffset + "," + ChunkSize);
+                // Console.WriteLine((i + 1).ToString("D8") + "," + ChunkOffset + "," + ChunkSize);
             }
-            Console.WriteLine(totalChunkSize);
-            //SortedDictionary<long, long> sortedDict = new SortedDictionary<long, long>(MetaChunk);
+            //Console.WriteLine(totalChunkSize);
 
             // Write decompressed chunks to pkg
             BinaryWriter Writer = new BinaryWriter(File.Create(NamePKG));
@@ -57,20 +56,8 @@ namespace WorldChunkTool
                 {
                     Reader.BaseStream.Seek(Entry.Key, SeekOrigin.Begin);
                     byte[] ChunkCompressed = Reader.ReadBytes((int)Entry.Value); // Unsafe cast
-                    //BinaryWriter Writer3 = new BinaryWriter(File.Create($"{Environment.CurrentDirectory}\\G60_cmp\\chunk_{DictCount.ToString("D8")}_cmp.bin"));
-                    //Writer3.Write(ChunkCompressed);
-                    //Writer3.Close();
-
                     byte[] ChunkDecompressed = Utils.Decompress(ChunkCompressed, ChunkCompressed.Length, 0x40000);
-                    //BinaryWriter Writer2 = new BinaryWriter(File.Create($"{Environment.CurrentDirectory}\\G60_decmp\\chunk_{DictCount.ToString("D8")}_decmp.bin"));
-                    //Writer2.Write(ChunkDecompressed);
-                    //Writer2.Close();
-
                     if (!FlagBaseGame) { Utils.DecryptChunk(ChunkDecompressed, Utils.GetChunkKey(DictCount - 1)); }
-                    //BinaryWriter Writer4 = new BinaryWriter(File.Create($"{Environment.CurrentDirectory}\\G60_decrypt\\chunk_{DictCount.ToString("D8")}_decrypt.bin"));
-                    //Writer4.Write(ChunkDecompressed);
-                    //Writer4.Close();
-
                     Writer.Write(ChunkDecompressed);
                 }
                 else
@@ -87,16 +74,9 @@ namespace WorldChunkTool
             Utils.Print("Finished.", true);
             Utils.Print($"Output at: {NamePKG}", false);
 
-            if (!FlagAutoConfirm)
-            {
-                Console.WriteLine("Press Enter to quit.");
-                Console.Read();
-            }
-
-            Console.SetCursorPosition(0, Console.CursorTop - 1); // remove this
-            Console.WriteLine("=============================="); // remove this
-            PKG.ExtractPKG(NamePKG, FlagAutoConfirm, FlagUnpackAll); // remove this
-            if (!FlagAutoConfirm) { Console.Read(); } // remove this
+            // Write csv
+            Utils.Print("Writing file list.", false);
+            PKG.ExtractPKG(NamePKG, FlagAutoConfirm, FlagUnpackAll, true);
         }
     }
 }
