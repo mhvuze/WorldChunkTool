@@ -62,8 +62,11 @@ namespace WorldChunkTool
                         Reader.BaseStream.Seek(FileOffset, SeekOrigin.Begin);
                         byte[] ArrayFileData = Reader.ReadBytes(Convert.ToInt32(FileSize));
 
-                        new FileInfo($"{OutputDirectory}\\{StringNameParent}").Directory.Create();
-                        File.WriteAllBytes($"{OutputDirectory}\\{StringNameParent}", ArrayFileData);
+                        if (!OnlyLog)
+                        {
+                            new FileInfo($"{OutputDirectory}\\{StringNameParent}").Directory.Create();
+                            File.WriteAllBytes($"{OutputDirectory}\\{StringNameParent}", ArrayFileData);
+                        }
 
                         Reader.BaseStream.Seek(ReaderPositionBeforeEntry, SeekOrigin.Begin);
                     }

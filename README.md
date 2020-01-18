@@ -18,9 +18,9 @@ Options:
 
 **WARNING:** Please be careful and don't download *oo2core_8_win64.dll* randomly from the web.
 
-#### Acknowledgements (needs finalization)
+### Acknowledgements (needs finalization)
 - For help with the tool itself: Jodo, Asterisk, Stracker
-- For key help with decrypting Iceborne data: MoonBunnie, Asterisk
+- For major help with decrypting Iceborne data: MoonBunnie, Asterisk
 - For help with bruteforcing keys early on: XunLi, Asterisk, Dallagen, MoonBunnie, Kiranico, DMQW, Aradi147, Ice, Jodo, Miralis
 
 Changelog notes (delete after finalization):
