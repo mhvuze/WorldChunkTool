@@ -10,7 +10,7 @@ namespace WorldChunkTool
         /* Exit Codes:
          * 0 - No error
          * 1 - Input file missing
-         * 2 - oo2core_5_win64.dll file missing
+         * 2 - oo2core_8_win64.dll file missing
          * 3 - Other exception
          */
 
@@ -55,7 +55,6 @@ namespace WorldChunkTool
             {
                 if (FlagUnpackAll && File.GetAttributes(FileInput).HasFlag(FileAttributes.Directory))
                 {
-                    // MHW: Base Game
                     string[] ChunkFiles = Directory.GetFiles(FileInput, "chunk*.bin", SearchOption.TopDirectoryOnly).CustomSort().ToArray();
                     foreach (string ChunkFile in ChunkFiles) { Console.WriteLine($"Processing {ChunkFile}."); ProcessFile(ChunkFile); }
                 }

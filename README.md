@@ -18,16 +18,8 @@ Options:
 
 **WARNING:** Please be careful and don't download *oo2core_8_win64.dll* randomly from the web.
 
-### Acknowledgements (needs finalization)
+### Acknowledgements:
 - For help with the tool itself: Jodo, Asterisk, Stracker
-- For major help with decrypting Iceborne data: MoonBunnie, Asterisk
-- For help with bruteforcing keys early on: XunLi, Asterisk, Dallagen, MoonBunnie, Kiranico, DMQW, Aradi147, Ice, Jodo, Miralis
-
-Changelog notes (delete after finalization):
-- readonly support
-- fixed order for UnpackAll
-- on the fly jodo
-- build pkg
-- support for Iceborne
-- switch basegame
-- deleted pkg extract and pkg delete
+- For providing the final Iceborne chunk key order: legendff
+- For working on a keygen regarding Iceborne chunk encryption: MoonBunnie, Asterisk
+- For help with bruteforcing the Iceborne chunk key order early on: XunLi, Asterisk, Dallagen, MoonBunnie, Kiranico, DMQW, Aradi147, Ice, Jodo, Miralis
