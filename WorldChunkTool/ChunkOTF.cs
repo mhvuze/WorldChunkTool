@@ -258,7 +258,9 @@ namespace WorldChunkTool
             else
             {
                 reader.BaseStream.Seek(offset, SeekOrigin.Begin);
-                return reader.ReadBytes(0x40000);
+                byte[] ChunkDecompressed = Reader.ReadBytes(0x40000);
+                if (!FlagBaseGame) { Utils.DecryptChunk(ChunkDecompressed, Utils.GetChunkKey(chunkNum)); }
+                return ChunkDecompressed;
             }
         }
 

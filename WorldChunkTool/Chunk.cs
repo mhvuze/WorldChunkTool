@@ -64,6 +64,7 @@ namespace WorldChunkTool
                 {
                     Reader.BaseStream.Seek(Entry.Key, SeekOrigin.Begin);
                     byte[] ChunkDecompressed = Reader.ReadBytes(0x40000);
+                    if (!FlagBaseGame) { Utils.DecryptChunk(ChunkDecompressed, Utils.GetChunkKey(DictCount - 1)); }
                     Writer.Write(ChunkDecompressed);
                 }
                 DictCount++;
