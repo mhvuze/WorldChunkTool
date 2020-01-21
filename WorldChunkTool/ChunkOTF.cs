@@ -41,7 +41,8 @@ namespace WorldChunkTool
             // Read header
             Reader.BaseStream.Seek(4, SeekOrigin.Begin);
             int ChunkCount = Reader.ReadInt32(); int ChunkPadding = ChunkCount.ToString().Length;
-            Console.WriteLine($"{ChunkCount} subchunks detected.");
+            double DiskSpace = (Int64)ChunkCount * (Int64)0x40000 * 1e-9;
+            Console.WriteLine($"{ChunkCount} subchunks detected. Requires at least: {Math.Round(DiskSpace, 2)} GB.");
 
             // Read file list
             DictCount = 0;

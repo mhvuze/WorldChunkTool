@@ -17,7 +17,8 @@ namespace WorldChunkTool
             // Read header
             Reader.BaseStream.Seek(4, SeekOrigin.Begin);
             int ChunkCount = Reader.ReadInt32(); int ChunkPadding = ChunkCount.ToString().Length;
-            Utils.Print($"{ChunkCount} chunks in this file.", false);
+            double DiskSpace = (Int64)ChunkCount * (Int64)0x40000 * 1e-9;
+            Utils.Print($"{ChunkCount} chunks in this file. Requires at least: {Math.Round(DiskSpace, 2)} GB.", false);
 
             // Read file list
             long totalChunkSize = 0;
